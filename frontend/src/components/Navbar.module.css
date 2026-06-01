@@ -1,0 +1,179 @@
+/* Dropdown Menu Animations */
+@keyframes dropdown-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes item-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes icon-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes icon-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes icon-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Apply animations */
+.animate-dropdown-enter {
+    animation: dropdown-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.menu-item-enter {
+    animation: item-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Staggered animation for menu items */
+.menu-item-stagger {
+    animation: item-slide-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Smooth transitions for interactive elements */
+.menu-item-link {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glow effect on hover */
+.menu-item-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(94, 106, 210, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+
+.menu-item-link:hover::before {
+    left: 100%;
+}
+
+/* Icon hover animation */
+.icon-hover-rotate {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.icon-hover-rotate:hover {
+    animation: icon-spin 0.6s ease-out;
+}
+
+/* Icon bounce on hover */
+.icon-hover-bounce:hover {
+    animation: icon-bounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Smooth color transitions */
+.transition-color-smooth {
+    transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced focus states */
+.focus-ring-accent:focus-visible {
+    outline: 2px solid rgba(94, 106, 210, 0.5);
+    outline-offset: 2px;
+}
+
+/* Ripple effect on click */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple-effect::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: rgba(94, 106, 210, 0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 0.6s ease-out;
+}
+
+/* Smooth backdrop filter transition */
+.backdrop-blur-smooth {
+    transition: backdrop-filter 0.3s ease-out;
+}
+
+/* Active state animation */
+@keyframes scale-pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.scale-pop {
+    animation: scale-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Menu item container smooth entrance */
+@keyframes fade-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-slide-up {
+    animation: fade-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

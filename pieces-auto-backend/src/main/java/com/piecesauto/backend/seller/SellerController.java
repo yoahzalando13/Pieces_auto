@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.piecesauto.backend.seller.dto.CreateShopRequest;
 import com.piecesauto.backend.seller.dto.SellerDashboardResponse;
@@ -38,6 +40,30 @@ public class SellerController {
 
         return ShopResponse.fromEntity(
                 sellerService.createMyShop(user.getId(), request)
+        );
+    }
+
+    @PutMapping("/shop")
+    public ShopResponse updateMyShop(
+            Authentication authentication,
+            @Valid @RequestBody CreateShopRequest request
+    ) {
+        User user = (User) authentication.getPrincipal();
+
+        return ShopResponse.fromEntity(
+                sellerService.updateMyShop(user.getId(), request)
+        );
+    }
+
+    @PostMapping("/shop/upload-logo")
+    public ShopResponse uploadShopLogo(
+            Authentication authentication,
+            @RequestParam("image") MultipartFile image
+    ) {
+        User user = (User) authentication.getPrincipal();
+
+        return ShopResponse.fromEntity(
+                sellerService.uploadShopLogo(user.getId(), image)
         );
     }
 

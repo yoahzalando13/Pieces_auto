@@ -7,6 +7,9 @@ import ProductsPage from "../pages/ProductsPage";
 import ProductDetailPage from "../pages/ProductDetailPage";
 import CartPage from "../pages/CartPage";
 import ProfilePage from "../pages/ProfilePage";
+import SellerSpacePage from "../pages/SellerSpacePage";
+import BecomeSellerPage from "../pages/BecomeSellerPage";
+import CreateProductPage from "../pages/CreateProductPage";
 
 export default function AppRouter() {
 
@@ -46,6 +49,21 @@ export default function AppRouter() {
             <Route
                 path="/profile"
                 element={<ProfilePage />}
+            />
+
+            <Route
+                path="/become-seller"
+                element={<BecomeSellerPage />}
+            />
+
+            <Route
+                path="/seller-space"
+                element={<SellerSpacePage />}
+            />
+
+            <Route
+                path="/create-product"
+                element={<CreateProductPage />}
             />
 
         </Routes>

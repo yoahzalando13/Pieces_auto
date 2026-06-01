@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import useAuth from "../hooks/UseAuth";
+import { getCart } from "../services/cartService";
+import styles from "./Navbar.module.css";
 
 // Modern Minimalist SVG Icons
 function HomeIcon({ className }) {
@@ -114,6 +116,125 @@ function SearchIcon({ className }) {
     );
 }
 
+function StoreIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M3 9h18" />
+            <path d="M5 9V5h14v4" />
+            <path d="M4 9v10h16V9" />
+            <path d="M9 19v-6h6v6" />
+        </svg>
+    );
+}
+
+function DashboardIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+        </svg>
+    );
+}
+
+function ShopWindowIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M6 4h12v7H6z" />
+            <path d="M6 11h12v9H6z" />
+            <path d="M12 7v8" />
+            <path d="M9 11v4" />
+            <path d="M15 11v4" />
+        </svg>
+    );
+}
+
+function BoxIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+    );
+}
+
+function BarChartIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <line x1="12" y1="20" x2="12" y2="10" />
+            <line x1="18" y1="20" x2="18" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="16" />
+        </svg>
+    );
+}
+
+function PackageIcon({ className }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+    );
+}
+
 function CloseIcon({ className }) {
     return (
         <svg 
@@ -141,11 +262,49 @@ export default function Navbar() {
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [cartCount, setCartCount] = useState(0);
+    const [isSellerMenuOpen, setIsSellerMenuOpen] = useState(false);
+    const [activeSellerTab, setActiveSellerTab] = useState(null);
+    const sellerMenuRef = useRef(null);
+
+    const sellerSectionItems = [
+        { id: "dashboard", label: "Tableau de bord", icon: <DashboardIcon className="w-4.5 h-4.5" /> },
+        { id: "shop", label: "Ma boutique", icon: <ShopWindowIcon className="w-4.5 h-4.5" /> },
+        { id: "products", label: "Produits", icon: <PackageIcon className="w-4.5 h-4.5" /> },
+        { id: "stock", label: "Stocks", icon: <BoxIcon className="w-4.5 h-4.5" /> },
+        { id: "sales", label: "Ventes", icon: <BarChartIcon className="w-4.5 h-4.5" /> },
+    ];
+
+    const updateCartCount = async () => {
+        try {
+            const cart = await getCart();
+            const count = cart.items ? cart.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+            setCartCount(count);
+        } catch (e) {
+            setCartCount(0);
+        }
+    };
+
+    useEffect(() => {
+        updateCartCount();
+        window.addEventListener("cart-updated", updateCartCount);
+        return () => window.removeEventListener("cart-updated", updateCartCount);
+    }, [user]);
+
+    // Extract active seller tab from URL query params
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const tabParam = searchParams.get("tab");
+        setActiveSellerTab(tabParam || "dashboard");
+    }, [location]);
 
     const menuItems = [
         { path: "/", label: "Accueil", icon: <HomeIcon className="w-5.5 h-5.5" /> },
         { path: "/products", label: "Catalogue", icon: <CatalogueIcon className="w-5.5 h-5.5" /> },
         { path: "/cart", label: "Panier", icon: <CartIcon className="w-5.5 h-5.5" /> },
+        ...(user?.role === "VENDEUR" || user?.role === "ADMIN"
+            ? [{ path: "/seller-space", label: "Ventes", icon: <StoreIcon className="w-5.5 h-5.5" /> }]
+            : []),
         { 
             path: user ? "/profile" : "/login", 
             label: user ? "Profil" : "Connexion", 
@@ -156,11 +315,13 @@ export default function Navbar() {
     // Detect active index based on route pathname
     const getActiveIndex = () => {
         const path = location.pathname;
-        if (path === "/") return 0;
-        if (path.startsWith("/products")) return 1;
-        if (path.startsWith("/cart")) return 2;
-        if (path.startsWith("/profile") || path.startsWith("/login") || path.startsWith("/register")) return 3;
-        return 0;
+        const activeItemIndex = menuItems.findIndex((item) => {
+            if (item.path === "/login") {
+                return path.startsWith("/profile") || path.startsWith("/login") || path.startsWith("/register");
+            }
+            return path === item.path || path.startsWith(`${item.path}/`);
+        });
+        return activeItemIndex >= 0 ? activeItemIndex : 0;
     };
 
     const activeIndex = getActiveIndex();
@@ -223,6 +384,18 @@ export default function Navbar() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isSearchOpen]);
+
+    useEffect(() => {
+        if (!isSellerMenuOpen) return;
+        function handleClickOutside(event) {
+            if (sellerMenuRef.current && !sellerMenuRef.current.contains(event.target)) {
+                setIsSellerMenuOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isSellerMenuOpen]);
 
     return (
         <>
@@ -303,6 +476,121 @@ export default function Navbar() {
                     {/* Nav Items */}
                     {menuItems.map((item, idx) => {
                         const isActive = activeIndex === idx;
+                        const isSellerMenu = item.path === "/seller-space";
+
+                        if (isSellerMenu) {
+                            return (
+                                <div
+                                    key={idx}
+                                    ref={(el) => {
+                                        sellerMenuRef.current = el;
+                                        itemsRef.current[idx] = el;
+                                    }}
+                                    className="relative flex flex-col items-center justify-center flex-1 md:flex-none md:h-14 md:px-7 py-1.5"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setIsSellerMenuOpen((open) => !open);
+                                        }}
+                                        className={`relative flex flex-col items-center justify-center w-full rounded-full transition-all duration-300 outline-hidden focus-visible:ring-2 focus-visible:ring-linear-accent select-none ${
+                                            isActive
+                                                ? "active text-white"
+                                                : "text-linear-text-muted hover:text-linear-text-secondary hover:scale-105"
+                                        }`}
+                                        aria-haspopup="menu"
+                                        aria-expanded={isSellerMenuOpen}
+                                    >
+                                        <div className={`relative transition-transform duration-300 ${isActive ? "animate-active-pop" : "scale-100"}`}>
+                                            {item.icon}
+                                            {item.label === "Panier" && cartCount > 0 && (
+                                                <span className="absolute -top-1.5 -right-1.5 bg-linear-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#070709] animate-pulse">
+                                                    {cartCount}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="relative flex flex-col items-center">
+                                            <span className="text-[10px] md:text-[11px] font-semibold mt-1.5 tracking-wide transition-colors duration-300">
+                                                {item.label}
+                                            </span>
+                                            {isActive && (
+                                                <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)] animate-pulse" />
+                                            )}
+                                        </div>
+                                    </button>
+
+                                    {isSellerMenuOpen && (
+                                        <div className="absolute left-1/2 bottom-full top-auto z-30 mb-3 min-w-[14rem] w-[calc(100vw-2rem)] max-w-[18rem] -translate-x-1/2 overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/90 p-3 shadow-[0_25px_65px_rgba(0,0,0,0.35)] backdrop-blur-2xl transition-all duration-200 ease-out md:bottom-auto md:top-full md:mb-0 md:mt-3 md:w-56 md:max-w-none animate-dropdown-enter">
+                                            {/* Arrow pointer */}
+                                            <div className="absolute bottom-[-0.5rem] md:bottom-auto md:-top-2 left-1/2 -translate-x-1/2 h-4 w-4 rotate-45 rounded-[6px] border-l border-t border-white/10 bg-slate-950/90" />
+                                            
+                                            {/* Header */}
+                                            <div className="text-[10px] uppercase tracking-[0.32em] text-linear-text-muted mb-3 px-1 font-bold">
+                                                Espace Vendeur
+                                            </div>
+                                            
+                                            {/* Menu Items */}
+                                            <div className="flex flex-col gap-2">
+                                                {sellerSectionItems.map((section, idx) => {
+                                                    const isActive = activeSellerTab === section.id;
+                                                    return (
+                                                        <Link
+                                                            key={section.id}
+                                                            to={`/seller-space?tab=${section.id}`}
+                                                            onClick={() => setIsSellerMenuOpen(false)}
+                                                            className={`group relative flex items-center gap-3 rounded-[18px] border px-3.5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out active:scale-95 ${
+                                                                isActive
+                                                                    ? "border-linear-accent/60 bg-gradient-to-r from-linear-accent/25 to-linear-accent/10 text-linear-accent shadow-[0_8px_24px_rgba(94,106,210,0.3)]"
+                                                                    : "border-white/8 bg-gradient-to-r from-white/[0.04] to-white/[0.02] text-white hover:border-linear-accent/40 hover:from-linear-accent/10 hover:to-linear-accent/5 hover:shadow-[0_8px_24px_rgba(94,106,210,0.2)]"
+                                                            }`}
+                                                            style={{ 
+                                                                animationDelay: `${idx * 50}ms`
+                                                            }}
+                                                        >
+                                                            {/* Icon Container with animation */}
+                                                            <div className={`flex items-center justify-center w-8 h-8 rounded-[12px] border transition-all duration-300 ease-out group-hover:scale-110 group-hover:-rotate-6 ${
+                                                                isActive
+                                                                    ? "bg-gradient-to-br from-linear-accent/50 to-linear-accent/30 border-linear-accent/60 text-white shadow-[0_4px_12px_rgba(94,106,210,0.4)]"
+                                                                    : "bg-gradient-to-br from-linear-accent/20 to-linear-accent/5 border-linear-accent/20 text-linear-accent group-hover:from-linear-accent/40 group-hover:to-linear-accent/20 group-hover:border-linear-accent/50 group-hover:shadow-[0_4px_12px_rgba(94,106,210,0.3)]"
+                                                            }`}>
+                                                                {section.icon}
+                                                            </div>
+                                                            
+                                                            {/* Label with animation */}
+                                                            <div className="flex-1 flex flex-col">
+                                                                <span className={`transition-colors duration-300 ${
+                                                                    isActive 
+                                                                        ? "text-linear-accent" 
+                                                                        : "text-white group-hover:text-linear-accent"
+                                                                }`}>
+                                                                    {section.label}
+                                                                </span>
+                                                            </div>
+                                                            
+                                                            {/* Arrow indicator - always visible when active */}
+                                                            <div className={`transition-all duration-300 transform ${
+                                                                isActive 
+                                                                    ? "opacity-100 translate-x-1" 
+                                                                    : "opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1"
+                                                            }`}>
+                                                                <svg className={`w-4 h-4 transition-colors duration-300 ${
+                                                                    isActive ? "text-linear-accent" : "text-linear-accent"
+                                                                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                                </svg>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
                         return (
                             <Link
                                 key={idx}
@@ -314,17 +602,20 @@ export default function Navbar() {
                                         : "text-linear-text-muted hover:text-linear-text-secondary hover:scale-105"
                                 }`}
                             >
-                                <div className={`transition-transform duration-300 ${isActive ? "animate-active-pop" : "scale-100"}`}>
+                                <div className={`relative transition-transform duration-300 ${isActive ? "animate-active-pop" : "scale-100"}`}>
                                     {item.icon}
+                                    {item.label === "Panier" && cartCount > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 bg-linear-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#070709] animate-pulse">
+                                            {cartCount}
+                                        </span>
+                                    )}
                                 </div>
                                 
-                                {/* Anchored Text and Active Dot Wrapper */}
                                 <div className="relative flex flex-col items-center">
                                     <span className="text-[10px] md:text-[11px] font-semibold mt-1.5 tracking-wide transition-colors duration-300">
                                         {item.label}
                                     </span>
 
-                                    {/* Micro Accent Indicator dot exactly 6px (mt-1.5) below the bottom edge of the text */}
                                     {isActive && (
                                         <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)] animate-pulse" />
                                     )}

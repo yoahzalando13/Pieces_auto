@@ -1,10 +1,16 @@
 package com.piecesauto.backend.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,6 +44,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
 
+        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
         // =========================
         // PUBLIC
         // =========================
@@ -62,6 +70,7 @@ public class SecurityConfig {
         // Routes produits publiques APRÈS les routes sensibles
         .requestMatchers("/api/products/**").permitAll()
 
+        .requestMatchers(HttpMethod.POST, "/api/sellers/shop").hasAnyRole("CLIENT", "VENDEUR")
         .requestMatchers("/api/sellers/shops/**").permitAll()
 
         .requestMatchers("/api/group-buys/open/**").permitAll()
@@ -80,32 +89,32 @@ public class SecurityConfig {
         // =========================
         // CLIENT / USER CONNECTÉ
         // =========================
-        .requestMatchers("/api/cart/**").hasRole("CLIENT")
+        .requestMatchers("/api/cart/**").hasAnyRole("CLIENT", "VENDEUR")
 
-        .requestMatchers("/api/orders/checkout").hasRole("CLIENT")
-        .requestMatchers("/api/orders/my/**").hasRole("CLIENT")
+        .requestMatchers("/api/orders/checkout").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/orders/my/**").hasAnyRole("CLIENT", "VENDEUR")
 
-        .requestMatchers("/api/payments/pay/**").hasRole("CLIENT")
-        .requestMatchers("/api/payments/fail/**").hasRole("CLIENT")
-        .requestMatchers("/api/payments/my/**").hasRole("CLIENT")
-        .requestMatchers("/api/payments/order/**").hasRole("CLIENT")
+        .requestMatchers("/api/payments/pay/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/payments/fail/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/payments/my/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/payments/order/**").hasAnyRole("CLIENT", "VENDEUR")
 
-        .requestMatchers("/api/deliveries/create/**").hasRole("CLIENT")
-        .requestMatchers("/api/deliveries/my/**").hasRole("CLIENT")
-        .requestMatchers("/api/deliveries/order/**").hasRole("CLIENT")
+        .requestMatchers("/api/deliveries/create/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/deliveries/my/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/deliveries/order/**").hasAnyRole("CLIENT", "VENDEUR")
 
         .requestMatchers(
                 org.springframework.http.HttpMethod.POST,
                 "/api/reviews/product/**"
-        ).hasRole("CLIENT")
-        .requestMatchers("/api/reviews/my/**").hasRole("CLIENT")
+        ).hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/reviews/my/**").hasAnyRole("CLIENT", "VENDEUR")
 
-        .requestMatchers("/api/group-buys/create/**").hasRole("CLIENT")
-        .requestMatchers("/api/group-buys/*/join").hasRole("CLIENT")
-        .requestMatchers("/api/group-buys/my/**").hasRole("CLIENT")
-        .requestMatchers("/api/group-buys/*/cancel").hasRole("CLIENT")
+        .requestMatchers("/api/group-buys/create/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/group-buys/*/join").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/group-buys/my/**").hasAnyRole("CLIENT", "VENDEUR")
+        .requestMatchers("/api/group-buys/*/cancel").hasAnyRole("CLIENT", "VENDEUR")
 
-        .requestMatchers("/api/notifications/**").hasRole("CLIENT")
+        .requestMatchers("/api/notifications/**").hasAnyRole("CLIENT", "VENDEUR")
 
         .requestMatchers("/api/recommendations/**")
         .hasAnyRole("CLIENT", "VENDEUR", "ADMIN")
@@ -135,7 +144,7 @@ public class SecurityConfig {
         // ANCIENNES ROUTES
         // =========================
         .requestMatchers("/api/vendeur/**").hasRole("VENDEUR")
-        .requestMatchers("/api/client/**").hasRole("CLIENT")
+        .requestMatchers("/api/client/**").hasAnyRole("CLIENT", "VENDEUR")
 
         .anyRequest().authenticated()
 )
@@ -144,6 +153,19 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOriginPatterns(List.of("http://localhost:5173"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+                configuration.setExposedHeaders(List.of("Authorization"));
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
     @Bean
     public UserDetailsService userDetailsService() {

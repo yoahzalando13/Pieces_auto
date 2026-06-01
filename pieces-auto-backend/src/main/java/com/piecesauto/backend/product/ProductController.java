@@ -61,6 +61,13 @@ public class ProductController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/{productId}")
+    public ProductResponse getProductById(@PathVariable Long productId) {
+        return ProductResponse.fromEntity(
+                productService.getProductById(productId)
+        );
+    }
+
     @GetMapping("/category/{categoryId}")
     public List<ProductResponse> getProductsByCategory(@PathVariable Long categoryId) {
         return productService.getProductsByCategory(categoryId)
