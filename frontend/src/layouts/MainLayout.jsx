@@ -18,7 +18,7 @@ export default function MainLayout({ children }) {
         <>
             <Navbar />
 
-            <main>
+            <main className="w-full flex-grow px-4 md:px-8 pt-6 pb-28 md:pt-28 md:pb-12 max-w-7xl mx-auto">
                 {children}
             </main>
 
