@@ -21,8 +21,12 @@ function StatusBadge({ status }) {
     );
 }
 
+function getRoleLabel(role) {
+    return role === "ADMIN" ? "Administrateur" : role === "VENDEUR" ? "Vendeur" : "Client";
+}
+
 export default function ProfilePage() {
-    const { user, setUser } = useAuth();
+    const { user, setUser, loading } = useAuth();
     const navigate = useNavigate();
 
     const [orders, setOrders]           = useState([]);
@@ -33,9 +37,10 @@ export default function ProfilePage() {
     const [error, setError]                     = useState("");
 
     useEffect(() => {
+        if (loading) return;
         if (!user) { navigate("/login"); return; }
         fetchOrders();
-    }, [user]);
+    }, [user, loading]);
 
     const fetchOrders = async () => {
         setIsLoadingOrders(true);
@@ -69,7 +74,7 @@ export default function ProfilePage() {
         navigate("/");
     };
 
-    if (!user) return null;
+    if (loading || !user) return null;
 
     const initials = `${user.prenom?.[0] ?? ""}${user.nom?.[0] ?? ""}`.toUpperCase() || "U";
 
@@ -89,9 +94,19 @@ export default function ProfilePage() {
                         </h1>
                         <p className="text-xs text-linear-text-muted mt-1">{user.telephone}</p>
                         {user.email && <p className="text-xs text-linear-text-muted">{user.email}</p>}
-                        <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-linear-accent/10 border border-linear-accent/25 text-[#a2acfc]">
-                            {user.role === "ADMIN" ? "Administrateur" : user.role === "VENDEUR" ? "Vendeur" : "Client"}
-                        </span>
+                        <div className="mt-2 flex flex-wrap items-center gap-3">
+                            <span className="inline-block text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-linear-accent/10 border border-linear-accent/25 text-[#a2acfc]">
+                                {getRoleLabel(user.role)}
+                            </span>
+                            {user.role !== "VENDEUR" && (
+                                <button
+                                    onClick={() => navigate("/become-seller")}
+                                    className="text-xs font-semibold text-white bg-linear-accent px-3 py-2 rounded-lg hover:bg-linear-accent-hover transition-all"
+                                >
+                                    Devenir vendeur
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -265,7 +280,7 @@ export default function ProfilePage() {
                         { label: "Nom",        value: user.nom },
                         { label: "Téléphone",  value: user.telephone },
                         { label: "Email",      value: user.email || "Non renseigné" },
-                        { label: "Rôle",       value: user.role === "ADMIN" ? "Administrateur" : user.role === "VENDEUR" ? "Vendeur" : "Client" },
+                        { label: "Rôle",       value: getRoleLabel(user.role) },
                         { label: "Compte créé",value: user.createdAt ? new Date(user.createdAt).toLocaleDateString("fr-FR", { day:"2-digit", month:"long", year:"numeric" }) : "—" },
                     ].map(({ label, value }) => (
                         <div key={label} className="flex justify-between items-center gap-4">

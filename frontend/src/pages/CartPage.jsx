@@ -4,7 +4,7 @@ import useAuth from "../hooks/UseAuth";
 import * as cartService from "../services/cartService";
 
 export default function CartPage() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
 
     // UI Steps: 1: Cart list, 2: Delivery form, 3: Payment select, 4: Success confirmation
@@ -26,12 +26,17 @@ export default function CartPage() {
     const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
     useEffect(() => {
+        if (loading) return;
         if (!user) {
             navigate("/login");
             return;
         }
         fetchCartDetails();
-    }, [user]);
+    }, [user, loading]);
+
+    if (loading) {
+        return null;
+    }
 
     const fetchCartDetails = async () => {
         setIsLoading(true);

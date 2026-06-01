@@ -60,3 +60,27 @@ export async function getCompatibilities(productId) {
     const response = await api.get(`/products/${productId}/compatibilities`);
     return response.data;
 }
+
+export async function getMySellerProducts() {
+    const response = await api.get("/products/seller/my");
+    return response.data;
+}
+
+export async function createSellerProduct(categoryId, productData) {
+    const response = await api.post(`/products/seller/categories/${categoryId}`, productData);
+    return response.data;
+}
+
+export async function uploadProductImage(productId, imageFile) {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    const response = await api.post(`/products/${productId}/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
+    return response.data;
+}
+
+export async function deleteProduct(productId) {
+    const response = await api.delete(`/products/${productId}`);
+    return response.data;
+}

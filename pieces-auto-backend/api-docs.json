@@ -1608,6 +1608,37 @@
         }
       }
     },
+    "/api/products/{productId}": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/products/{productId}/compatibilities": {
       "get": {
         "tags": [
@@ -3661,11 +3692,11 @@
             "type": "string",
             "format": "date-time"
           },
-          "enabled": {
-            "type": "boolean"
-          },
           "password": {
             "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
           },
           "username": {
             "type": "string"

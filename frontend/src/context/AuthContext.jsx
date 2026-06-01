@@ -16,7 +16,9 @@ export function AuthProvider({ children }) {
                     setUser(response.data);
                 } catch (e) {
                     console.error("Failed to restore session", e);
-                    localStorage.removeItem("token");
+                    if (e.response?.status === 401 || e.response?.status === 403) {
+                        localStorage.removeItem("token");
+                    }
                 }
             }
             setLoading(false);
