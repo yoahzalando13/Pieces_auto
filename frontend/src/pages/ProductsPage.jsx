@@ -4,6 +4,151 @@ import useAuth from "../hooks/UseAuth";
 import * as productService from "../services/productService";
 import * as cartService from "../services/cartService";
 
+function FiltersPanel({
+    categories,
+    brands,
+    models,
+    selectedCategory,
+    setSelectedCategory,
+    selectedBrand,
+    setSelectedBrand,
+    selectedModel,
+    setSelectedModel,
+    selectedEngine,
+    setSelectedEngine,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    onApply,
+    onReset,
+    onClose,
+    isMobile = false,
+}) {
+    return (
+        <div className={`flex flex-col gap-6 linear-glass rounded-2xl p-6 h-fit z-10 ${isMobile ? "w-full max-w-xl max-h-[88vh] overflow-y-auto shadow-[0_25px_80px_rgba(0,0,0,0.55)]" : ""}`}>
+            <div className="flex items-center justify-between border-b border-linear-border pb-4">
+                <h3 className="text-sm font-semibold text-linear-text-primary tracking-wider uppercase">
+                    Filtres Avancés
+                </h3>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onReset}
+                        className="text-xs text-linear-accent hover:text-white transition-colors cursor-pointer"
+                    >
+                        Effacer tout
+                    </button>
+                    {isMobile && onClose && (
+                        <button
+                            onClick={onClose}
+                            className="text-xs text-linear-text-muted hover:text-white transition-colors cursor-pointer"
+                        >
+                            Fermer
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
+                    Catégorie
+                </label>
+                <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer"
+                >
+                    <option value="">Toutes les catégories</option>
+                    {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
+                    Marque Véhicule
+                </label>
+                <select
+                    value={selectedBrand}
+                    onChange={(e) => setSelectedBrand(e.target.value)}
+                    className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer"
+                >
+                    <option value="">Toutes les marques</option>
+                    {brands.map((b) => (
+                        <option key={b.id} value={b.name}>
+                            {b.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
+                    Modèle
+                </label>
+                <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    disabled={!selectedBrand}
+                    className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <option value="">Tous les modèles</option>
+                    {models.map((m) => (
+                        <option key={m.id} value={m.name}>
+                            {m.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
+                    Motorisation
+                </label>
+                <input
+                    type="text"
+                    placeholder="ex: 1.2 PureTech"
+                    value={selectedEngine}
+                    onChange={(e) => setSelectedEngine(e.target.value)}
+                    className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all"
+                />
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
+                    Prix (Ar)
+                </label>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="number"
+                        placeholder="Min"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                        className="w-1/2 bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 transition-all"
+                    />
+                    <input
+                        type="number"
+                        placeholder="Max"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                        className="w-1/2 bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 transition-all"
+                    />
+                </div>
+            </div>
+
+            <button
+                onClick={onApply}
+                className="w-full bg-[#f7f8f8] hover:bg-[#e4e4e7] text-black text-xs font-semibold py-2.5 rounded-lg active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_4px_12px_rgba(255,255,255,0.05)] mt-2"
+            >
+                Appliquer les filtres
+            </button>
+        </div>
+    );
+}
+
 export default function ProductsPage() {
     const { user } = useAuth();
     const location = useLocation();
@@ -34,6 +179,7 @@ export default function ProductsPage() {
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const [goToPageValue, setGoToPageValue] = useState("");
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const productsPerPage = 9;
 
     // Cart loading state per product
@@ -196,6 +342,7 @@ export default function ProductsPage() {
         setMinPrice("");
         setMaxPrice("");
         fetchAll();
+        setIsFiltersOpen(false);
     };
 
     // Add product to cart
@@ -305,123 +452,76 @@ export default function ProductsPage() {
                 )}
             </form>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Left Side: Advanced Filters Bar */}
-                <div className="lg:col-span-1 flex flex-col gap-6 linear-glass rounded-2xl p-6 h-fit z-10">
-                    <div className="flex items-center justify-between border-b border-linear-border pb-4">
-                        <h3 className="text-sm font-semibold text-linear-text-primary tracking-wider uppercase">
-                            Filtres Avancés
-                        </h3>
-                        <button
-                            onClick={resetFilters}
-                            className="text-xs text-linear-accent hover:text-white transition-colors cursor-pointer"
-                        >
-                            Effacer tout
-                        </button>
-                    </div>
+            <div className="lg:hidden flex items-center justify-between gap-3">
+                <button
+                    type="button"
+                    onClick={() => setIsFiltersOpen(true)}
+                    className="inline-flex items-center justify-center gap-2 bg-white/[0.04] hover:bg-white/[0.08] border border-linear-border text-linear-text-primary text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 12h10M10 20h4" />
+                    </svg>
+                    Filtres Avancés
+                </button>
+                <span className="text-[11px] text-linear-text-muted">
+                    Affichage mobile
+                </span>
+            </div>
 
-                    {/* Category Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
-                            Catégorie
-                        </label>
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer"
-                        >
-                            <option value="">Toutes les catégories</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Brand Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
-                            Marque Véhicule
-                        </label>
-                        <select
-                            value={selectedBrand}
-                            onChange={(e) => setSelectedBrand(e.target.value)}
-                            className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer"
-                        >
-                            <option value="">Toutes les marques</option>
-                            {brands.map((b) => (
-                                <option key={b.id} value={b.name}>
-                                    {b.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Model Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
-                            Modèle
-                        </label>
-                        <select
-                            value={selectedModel}
-                            onChange={(e) => setSelectedModel(e.target.value)}
-                            disabled={!selectedBrand}
-                            className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-secondary focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            <option value="">Tous les modèles</option>
-                            {models.map((m) => (
-                                <option key={m.id} value={m.name}>
-                                    {m.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Engine Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
-                            Motorisation
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="ex: 1.2 PureTech"
-                            value={selectedEngine}
-                            onChange={(e) => setSelectedEngine(e.target.value)}
-                            className="w-full bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 focus:ring-0 transition-all"
+            {isFiltersOpen && (
+                <div className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm px-4 py-6 flex items-center justify-center lg:hidden animate-modal-backdrop">
+                    <div className="absolute inset-0" onClick={() => setIsFiltersOpen(false)} />
+                    <div className="relative w-full flex justify-center animate-modal-panel">
+                        <FiltersPanel
+                            isMobile
+                            categories={categories}
+                            brands={brands}
+                            models={models}
+                            selectedCategory={selectedCategory}
+                            setSelectedCategory={setSelectedCategory}
+                            selectedBrand={selectedBrand}
+                            setSelectedBrand={setSelectedBrand}
+                            selectedModel={selectedModel}
+                            setSelectedModel={setSelectedModel}
+                            selectedEngine={selectedEngine}
+                            setSelectedEngine={setSelectedEngine}
+                            minPrice={minPrice}
+                            setMinPrice={setMinPrice}
+                            maxPrice={maxPrice}
+                            setMaxPrice={setMaxPrice}
+                            onApply={() => {
+                                fetchFilteredProducts();
+                                setIsFiltersOpen(false);
+                            }}
+                            onReset={resetFilters}
+                            onClose={() => setIsFiltersOpen(false)}
                         />
                     </div>
+                </div>
+            )}
 
-                    {/* Price Range Filter */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-[11px] font-semibold text-linear-text-muted tracking-wider uppercase">
-                            Prix (Ar)
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="number"
-                                placeholder="Min"
-                                value={minPrice}
-                                onChange={(e) => setMinPrice(e.target.value)}
-                                className="w-1/2 bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 transition-all"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Max"
-                                value={maxPrice}
-                                onChange={(e) => setMaxPrice(e.target.value)}
-                                className="w-1/2 bg-black/30 border border-linear-border rounded-lg p-2.5 text-xs text-linear-text-primary placeholder-linear-text-muted/40 focus:outline-none focus:border-linear-accent/50 transition-all"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Apply Button */}
-                    <button
-                        onClick={() => fetchFilteredProducts()}
-                        className="w-full bg-[#f7f8f8] hover:bg-[#e4e4e7] text-black text-xs font-semibold py-2.5 rounded-lg active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_4px_12px_rgba(255,255,255,0.05)] mt-2"
-                    >
-                        Appliquer les filtres
-                    </button>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Left Side: Advanced Filters Bar */}
+                <div className="hidden lg:block lg:col-span-1">
+                    <FiltersPanel
+                        categories={categories}
+                        brands={brands}
+                        models={models}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
+                        selectedBrand={selectedBrand}
+                        setSelectedBrand={setSelectedBrand}
+                        selectedModel={selectedModel}
+                        setSelectedModel={setSelectedModel}
+                        selectedEngine={selectedEngine}
+                        setSelectedEngine={setSelectedEngine}
+                        minPrice={minPrice}
+                        setMinPrice={setMinPrice}
+                        maxPrice={maxPrice}
+                        setMaxPrice={setMaxPrice}
+                        onApply={() => fetchFilteredProducts()}
+                        onReset={resetFilters}
+                    />
                 </div>
 
                 {/* Right Side: Product Grid */}
