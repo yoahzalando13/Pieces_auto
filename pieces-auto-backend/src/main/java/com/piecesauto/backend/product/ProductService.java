@@ -291,6 +291,11 @@ public class ProductService {
     // READ PRODUCTS
     // =========================
 
+    public Product getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable"));
+    }
+
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }

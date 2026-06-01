@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import useAuth from "../hooks/UseAuth";
+import { getCart } from "../services/cartService";
 
 // Modern Minimalist SVG Icons
 function HomeIcon({ className }) {
@@ -141,6 +142,23 @@ export default function Navbar() {
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [cartCount, setCartCount] = useState(0);
+
+    const updateCartCount = async () => {
+        try {
+            const cart = await getCart();
+            const count = cart.items ? cart.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+            setCartCount(count);
+        } catch (e) {
+            setCartCount(0);
+        }
+    };
+
+    useEffect(() => {
+        updateCartCount();
+        window.addEventListener("cart-updated", updateCartCount);
+        return () => window.removeEventListener("cart-updated", updateCartCount);
+    }, [user]);
 
     const menuItems = [
         { path: "/", label: "Accueil", icon: <HomeIcon className="w-5.5 h-5.5" /> },
@@ -314,8 +332,13 @@ export default function Navbar() {
                                         : "text-linear-text-muted hover:text-linear-text-secondary hover:scale-105"
                                 }`}
                             >
-                                <div className={`transition-transform duration-300 ${isActive ? "animate-active-pop" : "scale-100"}`}>
+                                <div className={`relative transition-transform duration-300 ${isActive ? "animate-active-pop" : "scale-100"}`}>
                                     {item.icon}
+                                    {item.label === "Panier" && cartCount > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 bg-linear-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-[#070709] animate-pulse">
+                                            {cartCount}
+                                        </span>
+                                    )}
                                 </div>
                                 
                                 {/* Anchored Text and Active Dot Wrapper */}

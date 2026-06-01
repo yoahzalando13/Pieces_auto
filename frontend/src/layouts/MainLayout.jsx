@@ -5,6 +5,10 @@ import { useLocation } from "react-router-dom";
 export default function MainLayout({ children }) {
     const location = useLocation();
     const isAuthPage = ["/login", "/register"].includes(location.pathname);
+    const isSpacedPage = ["/products", "/cart", "/profile"].includes(location.pathname);
+    const mainSpacingClass = isSpacedPage
+        ? "w-full flex-grow px-4 md:px-8 pt-10 pb-32 md:pt-36 md:pb-16 max-w-7xl mx-auto z-10 relative"
+        : "w-full flex-grow px-4 md:px-8 pt-8 pb-32 md:pt-28 md:pb-16 max-w-7xl mx-auto z-10 relative";
 
     if (isAuthPage) {
         return (
@@ -21,7 +25,7 @@ export default function MainLayout({ children }) {
 
             <Navbar />
 
-            <main className="w-full flex-grow px-4 md:px-8 pt-8 pb-32 md:pt-28 md:pb-16 max-w-7xl mx-auto z-10 relative">
+            <main className={mainSpacingClass}>
                 {children}
             </main>
 
