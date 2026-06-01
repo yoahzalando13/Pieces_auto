@@ -1,0 +1,94 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: none;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  border-radius: 12px;
+
+  transition:
+    background .2s ease,
+    transform .2s ease;
+
+  user-select: none;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+}
+.primary {
+  background: #e63946;
+  color: white;
+
+  padding: 12px 20px;
+}
+
+.primary:hover {
+  background: #d62839;
+}
+
+.secondary {
+  background: white;
+
+  color: #e63946;
+
+  border: 1px solid #e63946;
+
+  padding: 12px 20px;
+}
+
+.outline {
+  background: transparent;
+
+  color: #212529;
+
+  border: 1px solid #dee2e6;
+
+  padding: 12px 20px;
+}
+
+.success {
+  background: #2a9d8f;
+
+  color: white;
+
+  padding: 12px 20px;
+}
+
+.danger {
+  background: #c1121f;
+
+  color: white;
+
+  padding: 12px 20px;
+}
+
+.iconButton {
+  width: 44px;
+  height: 44px;
+
+  padding: 0;
+
+  background: white;
+
+  border: 1px solid #dee2e6;
+
+  border-radius: 12px;
+}
