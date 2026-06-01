@@ -1,3 +1,98 @@
+@import "tailwindcss";
+
+/* Configuration du Design System - Inspiré par Linear.app */
+@theme {
+  --color-linear-bg: #070709;
+  --color-linear-accent: #5e6ad2;
+  --color-linear-accent-hover: #4d57c2;
+  --color-linear-accent-glow: rgba(94, 106, 210, 0.15);
+  --color-linear-card: rgba(13, 13, 18, 0.65);
+  --color-linear-border: rgba(255, 255, 255, 0.08);
+  --color-linear-border-focus: rgba(94, 106, 210, 0.5);
+  --color-linear-text-primary: #f7f8f8;
+  --color-linear-text-secondary: #b4bcd0;
+  --color-linear-text-muted: #8a8f98; /* Gris texturé premium de Linear */
+  --color-linear-text-paragraph: #8a8f98; /* Gris texturé pour les paragraphes */
+  --tracking-editorial: -0.02em; /* Espacement réduit de -0.02em pour les titres */
+}
+
+@utility linear-glass {
+  background: rgba(13, 13, 18, 0.65);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+@utility linear-glow {
+  background: radial-gradient(circle 800px at 50% -200px, rgba(94, 106, 210, 0.15), transparent);
+}
+
+@utility linear-dots {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+@utility linear-top-glow {
+  background: radial-gradient(circle 500px at 50% 0px, rgba(94, 106, 210, 0.08), transparent);
+}
+
+@utility linear-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@utility animate-card-enter {
+  animation: card-entrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility animate-float-glow {
+  animation: float-glow 12s infinite ease-in-out;
+}
+
+@utility progress-shimmer-glow {
+  background: linear-gradient(
+    90deg,
+    #5e6ad2 0%,
+    #a2acfc 25%,
+    #5e6ad2 50%,
+    #a2acfc 75%,
+    #5e6ad2 100%
+  );
+  background-size: 200% 100%;
+  animation: progress-shimmer 2s infinite linear;
+  box-shadow: 0 0 12px rgba(94, 106, 210, 0.6);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes progress-shimmer {
+  0% { background-position: 0% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes float-glow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0.85; }
+  50% { transform: translate(-48%, -52%) scale(1.08) rotate(5deg); opacity: 1; }
+}
+
+@keyframes card-entrance {
+  from { opacity: 0; transform: scale(0.97) translateY(12px); filter: blur(2px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+/* Variables CSS originales pour compatibilité */
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -11,11 +106,11 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --heading: 'Inter', system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
+  font: 16px/145% var(--sans);
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
@@ -26,7 +121,7 @@
   -moz-osx-font-smoothing: grayscale;
 
   @media (max-width: 1024px) {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -52,60 +147,46 @@
 
 body {
   margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
+/* Modifié pour éviter d'imposer un layout rigide sur toutes les pages */
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+main {
+  flex-grow: 1;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+/* Base Headings & Typography Styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.02em; /* Espacement éditorial Linear réduit */
+  text-rendering: optimizeLegibility;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
+
 p {
   margin: 0;
+  color: var(--text);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Premium Typography Utilities */
+@utility text-linear-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #b4bcd0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
 }
